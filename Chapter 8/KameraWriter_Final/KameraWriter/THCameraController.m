@@ -29,8 +29,8 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 
 @interface THCameraController () <AVCaptureVideoDataOutputSampleBufferDelegate,
-                                  AVCaptureAudioDataOutputSampleBufferDelegate,
-                                  THMovieWriterDelegate>
+AVCaptureAudioDataOutputSampleBufferDelegate,
+THMovieWriterDelegate>
 
 @property (strong, nonatomic) AVCaptureVideoDataOutput *videoDataOutput;
 @property (strong, nonatomic) AVCaptureAudioDataOutput *audioDataOutput;
@@ -46,7 +46,7 @@
     self.videoDataOutput = [[AVCaptureVideoDataOutput alloc] init];         // 1
     
     NSDictionary *outputSettings =
-        @{(id)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA)};
+    @{(id)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA)};
     
     self.videoDataOutput.videoSettings = outputSettings;
     self.videoDataOutput.alwaysDiscardsLateVideoFrames = NO;                // 2
@@ -74,17 +74,17 @@
     NSString *fileType = AVFileTypeQuickTimeMovie;
     
     NSDictionary *videoSettings =
-        [self.videoDataOutput
-            recommendedVideoSettingsForAssetWriterWithOutputFileType:fileType];
+    [self.videoDataOutput
+     recommendedVideoSettingsForAssetWriterWithOutputFileType:fileType];
     
     NSDictionary *audioSettings =
-        [self.audioDataOutput
-            recommendedAudioSettingsForAssetWriterWithOutputFileType:fileType];
+    [self.audioDataOutput
+     recommendedAudioSettingsForAssetWriterWithOutputFileType:fileType];
     
     self.movieWriter =
-        [[THMovieWriter alloc] initWithVideoSettings:videoSettings
-                                       audioSettings:audioSettings
-                                       dispatchQueue:self.dispatchQueue];
+    [[THMovieWriter alloc] initWithVideoSettings:videoSettings
+                                   audioSettings:audioSettings
+                                   dispatchQueue:self.dispatchQueue];
     self.movieWriter.delegate = self;
     
     return YES;
@@ -112,14 +112,14 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
        fromConnection:(AVCaptureConnection *)connection {
     
     [self.movieWriter processSampleBuffer:sampleBuffer];
-
+    
     if (captureOutput == self.videoDataOutput) {
         
         CVPixelBufferRef imageBuffer =
-            CMSampleBufferGetImageBuffer(sampleBuffer);
+        CMSampleBufferGetImageBuffer(sampleBuffer);
         
         CIImage *sourceImage =
-            [CIImage imageWithCVPixelBuffer:imageBuffer options:nil];
+        [CIImage imageWithCVPixelBuffer:imageBuffer options:nil];
         
         [self.imageTarget setImage:sourceImage];
     }
