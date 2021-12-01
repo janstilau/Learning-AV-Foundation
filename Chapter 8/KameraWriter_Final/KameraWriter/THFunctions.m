@@ -22,6 +22,7 @@ CGRect THCenterCropImageRect(CGRect sourceRect, CGRect previewRect) {
     return drawRect;
 }
 
+// 直接在这里, 进行
 CGAffineTransform THTransformForDeviceOrientation(UIDeviceOrientation orientation) {
     CGAffineTransform result;
     

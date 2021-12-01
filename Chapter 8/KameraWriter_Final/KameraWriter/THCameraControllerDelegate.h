@@ -1,3 +1,4 @@
+
 @protocol THCameraControllerDelegate <NSObject>
 
 - (void)deviceConfigurationFailedWithError:(NSError *)error;

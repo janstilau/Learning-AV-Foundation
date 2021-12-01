@@ -57,13 +57,26 @@ static NSString *const THThumbnailCreatedNotification = @"THThumbnailCreated";
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         
+        
+        /*
+         AVAsynchronousKeyValueLoading
+         
+         Creating an asset doesn’t make all of its data immediately available.
+         Instead, an asset waits to load its data until you perform an operation on it (for example, directly invoking any relevant AVAsset methods, implementing playback with an AVPlayerItem object, exporting with AVAssetExportSession, reading with an AVAssetReader, and so on).
+         Although you can request the value of a property at any time, and it returns its value synchronously, the operation may block the calling thread until the request completes.
+         
+         To avoid blocking:
+         If the asset hasn’t loaded a value, use the loadValuesAsynchronously(forKeys:completionHandler:) method to ask it to asynchronously load one or more of its values and notify you when it loads.
+         Determine whether the value for a specified key is available using the statusOfValue(forKey:error:) method.
+         
+         这种 API 设计出来, 就一定要按照它的设计出来. 既然有一个 Get 函数了, 如果不使用这个 Get 函数, 提前获取这个属性现在的状态, 那么就是使用者的问题了.
+         */
         AVAsset *asset = [AVAsset assetWithURL:videoURL];
         
         AVAssetImageGenerator *imageGenerator =
         [AVAssetImageGenerator assetImageGeneratorWithAsset:asset];
         imageGenerator.maximumSize = CGSizeMake(100.0f, 0.0f);
         imageGenerator.appliesPreferredTrackTransform = YES;
-        
         CGImageRef imageRef = [imageGenerator copyCGImageAtTime:kCMTimeZero
                                                      actualTime:NULL
                                                           error:nil];

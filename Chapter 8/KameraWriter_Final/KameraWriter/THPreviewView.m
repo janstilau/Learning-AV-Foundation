@@ -69,6 +69,9 @@
     self.filter = notification.object;
 }
 
+/*
+    根据传递过来的值, 进行页面的更新.
+ */
 - (void)setImage:(CIImage *)sourceImage {
 
     [self bindDrawable];
