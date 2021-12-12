@@ -5,8 +5,11 @@
 static NSString *const THThumbnailCreatedNotification = @"THThumbnailCreated";
 
 @interface THAssetsLibrary ()
+
 @property (strong, nonatomic) ALAssetsLibrary *library;
+
 @end
+
 @implementation THAssetsLibrary
 
 - (instancetype)init {
@@ -56,8 +59,6 @@ static NSString *const THThumbnailCreatedNotification = @"THThumbnailCreated";
 - (void)generateThumbnailForVideoAtURL:(NSURL *)videoURL {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        
-        
         /*
          AVAsynchronousKeyValueLoading
          
