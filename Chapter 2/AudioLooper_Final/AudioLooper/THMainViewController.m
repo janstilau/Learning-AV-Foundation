@@ -43,12 +43,12 @@
 - (void)viewDidLoad {
     self.controller = [[THPlayerController alloc] init];
     self.controller.delegate = self;
-
+    
     self.rateKnob.minimumValue = 0.5f;
     self.rateKnob.maximumValue = 1.5f;
     self.rateKnob.value = 1.0f;
     self.rateKnob.defaultValue = 1.0f;
-
+    
     // Panning L = -1, C = 0, R = 1
     for (THControlKnob *knob in self.panKnobs) {
         knob.minimumValue = -1.0f;
@@ -56,7 +56,7 @@
         knob.value = 0.0f;
         knob.defaultValue = 0.0f;
     }
-
+    
     // Volume Ranges from 0..1
     for (THControlKnob *knob in self.volumeKnobs) {
         knob.minimumValue = 0.0f;
