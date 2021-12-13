@@ -36,5 +36,11 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+    <key>NSCameraUsageDescription</key>
+    <string>为您可以正常使用扫描设备、拍摄图片、视频通话等功能，请开启摄像头权限</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>为您可以正常使用跟读、语音通话、留言等功能，请开启麦克风权限</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>问您可以正常使用更换头像、发送图片等功能，请开启相册权限</string>
 </dict>
 </plist>

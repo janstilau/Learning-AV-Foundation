@@ -40,14 +40,14 @@
     self = [super init];
     if (self) {
         float dbResolution = MIN_DB / (TABLE_SIZE - 1);
-
+        
         _meterTable = [NSMutableArray arrayWithCapacity:TABLE_SIZE];
         _scaleFactor = 1.0f / dbResolution;
-
+        
         float minAmp = dbToAmp(MIN_DB);
         float ampRange = 1.0 - minAmp;
         float invAmpRange = 1.0 / ampRange;
-
+        
         for (int i = 0; i < TABLE_SIZE; i++) {
             float decibels = i * dbResolution;
             float amp = dbToAmp(decibels);

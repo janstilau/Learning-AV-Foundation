@@ -1,34 +1,28 @@
-//
-//  MIT License
-//
-//  Copyright (c) 2014 Bob McCune http://bobmccune.com/
-//  Copyright (c) 2014 TapHarmonic, LLC http://tapharmonic.com/
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//  THE SOFTWARE.
-//
-
 #import "THRecorderController.h"
 #import <AVFoundation/AVFoundation.h>
 #import "THMemo.h"
 #import "THLevelPair.h"
 #import "THMeterTable.h"
 
+/*
+ 
+ AVAudioRecorder 本地的数据的控制.
+ 
+ An object that records audio data to a file.
+ 
+ Use an audio recorder to:
+ Record audio from the system’s active input device
+ Record for a specified duration or until the user stops recording
+ Pause and resume a recording
+ Access recording-level metering data
+ */
+
+/*
+    Controller.
+    Player.
+    Session.
+    Uploader.
+ */
 @interface THRecorderController () <AVAudioRecorderDelegate>
 
 @property (strong, nonatomic) AVAudioPlayer *player;
@@ -46,16 +40,36 @@
         NSString *tmpDir = NSTemporaryDirectory();
         NSString *filePath = [tmpDir stringByAppendingPathComponent:@"memo.caf"];
         NSURL *fileURL = [NSURL fileURLWithPath:filePath];
-
+        
+        
+        /*
+         AVFormatIDKeys:
+         kAudioFormatLinearPCM
+         kAudioFormatMPEG4AAC
+         kAudioFormatAppleLossless
+         kAudioFormatAppleIMA4
+         kAudioFormatiLBC
+         kAudioFormatULaw
+         
+         
+         AVSampleRateKey:
+         8 kHz to 192 kHz
+         
+         
+         AVNumberOfChannelsKey:
+         1 to 64
+         */
         NSDictionary *settings = @{
-                                   AVFormatIDKey : @(kAudioFormatAppleIMA4),
-                                   AVSampleRateKey : @44100.0f,
-                                   AVNumberOfChannelsKey : @1,
-                                   AVEncoderBitDepthHintKey : @16,
-                                   AVEncoderAudioQualityKey : @(AVAudioQualityMedium)
-                                   };
-
+            AVFormatIDKey : @(kAudioFormatAppleIMA4), // 音频文件的存储格式
+            AVSampleRateKey : @44100.0f, // 采样率
+            AVNumberOfChannelsKey : @1, // 声道数
+            AVEncoderBitDepthHintKey : @16, // 位深.  --> 少一个采样格式.
+            AVEncoderAudioQualityKey : @(AVAudioQualityMedium)
+        };
+        
         NSError *error;
+        // 使用, 上面的属性, 以及存储文件位置, 来初始化一个 AVAudioRecorder 对象.
+        // AVAudioRecorder 可以将录制过程中的音频数据, 按照 Setting 里面的配置, 放置到 File 的文件末尾.
         self.recorder = [[AVAudioRecorder alloc] initWithURL:fileURL settings:settings error:&error];
         if (self.recorder) {
             self.recorder.delegate = self;
@@ -64,10 +78,10 @@
         } else {
             NSLog(@"Error: %@", [error localizedDescription]);
         }
-
+        
         _meterTable = [[THMeterTable alloc] init];
     }
-
+    
     return self;
 }
 
@@ -79,6 +93,9 @@
     [self.recorder pause];
 }
 
+/*
+ Block 存储, 然后调用 Stop. 在代理方法里面, 触发 completionHandler
+ */
 - (void)stopWithCompletionHandler:(THRecordingStopCompletionHandler)handler {
     self.completionHandler = handler;
     [self.recorder stop];
@@ -91,18 +108,19 @@
 }
 
 - (void)saveRecordingWithName:(NSString *)name completionHandler:(THRecordingSaveCompletionHandler)handler {
-
+    
     NSTimeInterval timestamp = [NSDate timeIntervalSinceReferenceDate];
     NSString *filename = [NSString stringWithFormat:@"%@-%f.m4a", name, timestamp];
-
+    
     NSString *docsDir = [self documentsDirectory];
     NSString *destPath = [docsDir stringByAppendingPathComponent:filename];
-
+    
     NSURL *srcURL = self.recorder.url;
     NSURL *destURL = [NSURL fileURLWithPath:destPath];
-
+    
     NSError *error;
     BOOL success = [[NSFileManager defaultManager] copyItemAtURL:srcURL toURL:destURL error:&error];
+    // 将, 文件转移都相应的位置, 然后把文件的相关信息, 包装成为一个 Model 对象.
     if (success) {
         handler(YES, [THMemo memoWithTitle:name url:destURL]);
         [self.recorder prepareToRecord];
@@ -130,7 +148,7 @@
     NSInteger hours = (time / 3600);
     NSInteger minutes = (time / 60) % 60;
     NSInteger seconds = time % 60;
-
+    
     NSString *format = @"%02i:%02i:%02i";
     return [NSString stringWithFormat:format, hours, minutes, seconds];
 }
