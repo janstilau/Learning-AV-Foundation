@@ -53,17 +53,22 @@
     AVAudioPlayer *player = [[AVAudioPlayer alloc] initWithContentsOfURL:fileURL
                                                                    error:&error];
     if (player) {
-        player.numberOfLoops = -1; // loop indefinitely
+        player.numberOfLoops = 1; // loop indefinitely
         player.enableRate = YES;
         
         /*
             prepareToPlay
          
+
          Calling this method preloads audio buffers and acquires the audio hardware necessary for playback. This method activates the audio session, so pass false to setActive(_:) if immediate playback isn’t necessary. For example, when using the category option duckOthers, this method lowers the audio outside of the app.
          The system calls this method when using the method play(), but calling it in advance minimizes the delay between calling play() and the start of sound output.
          Calling stop(), or allowing a sound to finish playing, undoes this setup.
+         
+         In step 1 of Figure 1-4, the application primes the playback audio queue. The application invokes the callback once for each of the audio queue buffers, filling them and adding them to the buffer queue. Priming ensures that playback can start instantly when your application calls the AudioQueueStart function (step 2).
          */
         [player prepareToPlay];
+        
+        player.delegate = self;
     } else {
         NSLog(@"Error creating player: %@", [error localizedDescription]);
     }
@@ -157,6 +162,16 @@
             [self.delegate playbackBegan];
         }
     }
+}
+
+/*
+    在播放的过程中, 打断点, 会发现以下, 和 CoreAudio 相关的线程.
+    com.apple.coreaudio.AQClient (11)
+    com.apple.audio.IOThread.client (13)
+    AQConverterThread (26)
+ */
+- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
+    NSLog(@"%s", __func__);
 }
 
 #pragma mark - Route Change Handler
